@@ -11,61 +11,63 @@
 #include <linux/unistd.h>
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Zin");
+MODULE_AUTHOR("1712206");
 
-
-#define START_MEM	PAGE_OFFSET
-#define END_MEM		ULLONG_MAX
-
-unsigned long long *system_call_table_addr;
+unsigned long **system_call_table_addr;
 
 /*custom syscall*/
-asmlinkage int (*original_open) (const char *filename, int flags, int mode);
-asmlinkage ssize_t (*original_write) (int fd, const char *buf, size_t count);
+asmlinkage int (*original_open)(const char *filename, int flags);
 
 /*Hook function - Do desired action here*/
-asmlinkage int open_hook(const char *filename, int flags, int mode){
+asmlinkage int new_open(const char *filename, int flags){
 	printk(KERN_INFO "OPEN HOOK FUNCTION IS IN\n");
-	printk(KERN_INFO "filename: %s", filename);
-	printk(KERN_INFO "filename: %s", *filename);
-	printk(KERN_INFO "flags: %i", flags);
-	printk(KERN_INFO "mode: %i", mode);
-	printk(KERN_INFO "OPENED FILE: %d\n", filename);
+	printk(KERN_INFO "Calling process:%s\n",current->comm);
+	printk(KERN_INFO "OPENED FILE: %s\n", filename);
 
-	return (*original_open)(filename, flags, mode);
-
+	const char *buf="stupid linux";
+	printk(KERN_INFO "Test str: %s\n",buf);
+	return (*original_open)(filename, flags);
 }
 
-asmlinkage ssize_t write_hook(int fd, const char *buf, size_t count){
-	printk(KERN_INFO "WRITE HOOK FUNCTION IS IN\n");
-	printk(KERN_INFO "fd: %d", fd);
-	printk(KERN_INFO "buf: %s", buf);
-	printk(KERN_INFO "size: %d", count);
+/*Make page writeable*/
+int make_rw(unsigned long address){
+	unsigned int level;
+	pte_t *pte = lookup_address(address, &level);
+	if(pte->pte &~_PAGE_RW){
+		pte->pte |=_PAGE_RW;
+	}
+	return 0;
+}
 
-	return (*original_write)(fd, buf, count);
+/* Make the page write protected */
+int make_ro(unsigned long address){
+	unsigned int level;
+	pte_t *pte = lookup_address(address, &level);
+	pte->pte = pte->pte &~_PAGE_RW;
+	return 0;
 }
 
 static int __init entry_point(void){
-	printk(KERN_INFO "HOOK LOADED Successfully...");
-	/*MY sys_call_table address*/
+	/*MY system_call_table_addr address*/
 	system_call_table_addr=(void *) kallsyms_lookup_name("sys_call_table");
 
 	/* Replace custom syscall with the correct system call name (open) to hook*/
-	write_cr0 (read_cr0 () & (~ 0x10000));
-	original_open = system_call_table_addr[__NR_open];
-	original_write = system_call_table_addr[__NR_write];
+	original_open = (void*)system_call_table_addr[__NR_open];
+
+	/*Disable page protection*/
+	make_rw((unsigned long)system_call_table_addr);
+
 	/*Change syscall to our syscall function*/
-	system_call_table_addr[__NR_open] = open_hook;
-//	system_call_table_addr[__NR_write]= write_hook;
+	system_call_table_addr[__NR_open] = (unsigned long*)new_open;
 	return 0;
 }
 
 static void __exit exit_point(void){
-	printk(KERN_INFO "HOOK UNLOADED Successfully...");
 	/*Restore original system call */
-	system_call_table_addr[__NR_open] = original_open;
-//	system_call_table_addr[__NR_write] = original_write;
-	write_cr0 (read_cr0 () | 0x10000);
+	system_call_table_addr[__NR_open] = (unsigned long*)original_open;
+
+	/*Renable page protection*/
+	make_ro((unsigned long)system_call_table_addr);
 	return;
 }
 
