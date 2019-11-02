@@ -24,8 +24,6 @@ asmlinkage int new_open(const char *filename, int flags){
 	printk(KERN_INFO "Calling process:%s\n",current->comm);
 	printk(KERN_INFO "OPENED FILE: %s\n", filename);
 
-	const char *buf="stupid linux";
-	printk(KERN_INFO "Test str: %s\n",buf);
 	return (*original_open)(filename, flags);
 }
 
