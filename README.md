@@ -1,8 +1,9 @@
-# Random Number Generator Character Device Driver
+# Linux Kernel Module - Character Device Driver
+## Random Number Generator Character Device Driver
 Mã nguồn trong file **chardevdrv.c** dùng để biên dịch ra module là một character device driver,
 có chức năng cho phép các tiến trình ở user space mở và đọc một số ngẫu
 nhiên từ file thiết bị của device này.
-# Hướng dẫn sử dụng
+## Hướng dẫn sử dụng
 1. Mở Terminal, gõ lệnh `make` , file chardevdrv.ko sẽ được tạo ra
 2. Gõ lệnh `modinfo chardevdrv.ko` để xem thông tin của module
 3. Gõ lệnh `sudo insmod chardevdrv.ko` để cài đặt module driver này
