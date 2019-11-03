@@ -11,4 +11,4 @@ nhiên từ file thiết bị của device này.
 ```
 sudo dd if=/dev/randnum bs=4 count=1 | hexdump -C
 ```
-	Lệnh trên đọc 4 byte từ file thiết bị `/dev/randnum` và xuất ra màn hình Terminal dưới dạng kí tự hexa (dùng lệnh `hexdump`). Chạy lệnh này nhiều lần, mỗi lần sẽ cho ra các kết quả ngẫu nhiên khác nhau.
+Lệnh trên đọc 4 byte từ file thiết bị `/dev/randnum` và xuất ra màn hình Terminal dưới dạng kí tự hexa (dùng lệnh `hexdump`). Chạy lệnh này nhiều lần, mỗi lần sẽ cho ra các kết quả ngẫu nhiên khác nhau.
