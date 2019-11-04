@@ -3,5 +3,5 @@
 - Viết một module dùng để tạo ra số ngẫu nhiên.
 - Module này sẽ tạo một character device để cho phép các tiền trình ở user space có thể open và read các số ngẫu nhiên
 ## Phần 2 (/Hook) : Chương trình hook vào một system call:
-- syscall open =>ghi vào dmesg tên tiến trình mở file và tên file được mở
+- syscall open => ghi vào dmesg tên tiến trình mở file và tên file được mở
 - syscall write => ghi vào dmesg tên tiến trình, tên file bị ghi và số byte được ghi
