@@ -20,7 +20,7 @@ asmlinkage int (*original_open)(const char *pathname, int flags);
 
 /*Hook function - Do desired action here*/
 asmlinkage int new_open(const char *pathname, int flags){
-	if (strstr(pathname,"a.txt")==0) {
+	if (strstr(pathname,"testrun")==0) {
 		printk(KERN_INFO "Calling process:%s\n",current->comm);
 		printk(KERN_INFO "OPENED FILE: %s\n", pathname);
 	}

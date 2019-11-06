@@ -55,7 +55,7 @@ asmlinkage ssize_t new_write(unsigned int fd, const void *buf, size_t count){
 
 	int bytes= original_write(fd,buf,count);
 
-	if (strstr(pathname,"a.txt")==0) {
+	if (strstr(pathname,"testrun")==0) {
 		printk(KERN_INFO "Calling process: %s\n", current->comm);
 		printk(KERN_INFO "Write to: %s\n", pathname);
 		printk(KERN_INFO "Bytes written: %d\n", bytes);

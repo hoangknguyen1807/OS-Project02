@@ -10,7 +10,7 @@
 int main(){
 	char name[32];
 	char buf[100]="Hello World!!!\n";
-	strcpy(name,"a.txt");
+	strcpy(name,"out.txt");
 	int fd=open(name, O_WRONLY | O_CREAT);
 	int count=write(fd, buf, strlen(buf));
 
