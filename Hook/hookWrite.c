@@ -9,6 +9,8 @@
 #include <linux/sched.h>
 #include <linux/moduleparam.h>
 #include <linux/unistd.h>
+#include <linux/fs.h>
+#include <linux/fdtable.h>
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("1712206");
@@ -20,14 +22,45 @@ asmlinkage ssize_t (*original_write)(unsigned int fd, const void *buf, size_t co
 
 /*Hook function - Do desired action here*/
 asmlinkage ssize_t new_write(unsigned int fd, const void *buf, size_t count){
-	printk(KERN_INFO "Calling process: %s\n", current->comm);
+	char *tmp;
+	char *pathname;
+	struct file *file;
+	struct path *path;
 
-	char pathname[255];
-//	fd_to_pathname(fd, pathname);
-//	printk(KERN_INFO "Written file: %s\n", pathname);
+	spin_lock(&current->files->file_lock);
+	file = fcheck_files(current->files, fd);
+	if (!file) {
+		spin_unlock(&current->files->file_lock);
+		return -ENOENT;
+	}
+
+	path = &file->f_path;
+	path_get(path);
+	spin_unlock(&current->files->file_lock);
+
+	tmp = (char *)__get_free_page(GFP_KERNEL);
+
+	if (!tmp) {
+		path_put(path);
+		return -ENOMEM;
+	}
+
+	pathname = d_path(path, tmp, PAGE_SIZE);
+	path_put(path);
+
+	if (IS_ERR(pathname)) {
+		free_page((unsigned long)tmp);
+		return PTR_ERR(pathname);
+	}
 
 	int bytes= original_write(fd,buf,count);
-	printk(KERN_INFO "Bytes written: %d\n", bytes);
+
+	if (strstr(pathname,"a.txt")==0) {
+		printk(KERN_INFO "Calling process: %s\n", current->comm);
+		printk(KERN_INFO "Write to: %s\n", pathname);
+		printk(KERN_INFO "Bytes written: %d\n", bytes);
+	}
+	free_page((unsigned long)tmp);
 
 	return bytes;
 }

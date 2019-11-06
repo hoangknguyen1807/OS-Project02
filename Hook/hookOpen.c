@@ -16,15 +16,15 @@ MODULE_AUTHOR("1712206");
 unsigned long **system_call_table_addr;
 
 /*custom syscall*/
-asmlinkage int (*original_open)(const char *filename, int flags);
+asmlinkage int (*original_open)(const char *pathname, int flags);
 
 /*Hook function - Do desired action here*/
-asmlinkage int new_open(const char *filename, int flags){
-	printk(KERN_INFO "OPEN HOOK FUNCTION IS IN\n");
-	printk(KERN_INFO "Calling process:%s\n",current->comm);
-	printk(KERN_INFO "OPENED FILE: %s\n", filename);
-
-	return (*original_open)(filename, flags);
+asmlinkage int new_open(const char *pathname, int flags){
+	if (strstr(pathname,"a.txt")==0) {
+		printk(KERN_INFO "Calling process:%s\n",current->comm);
+		printk(KERN_INFO "OPENED FILE: %s\n", pathname);
+	}
+	return (*original_open)(pathname, flags);
 }
 
 /*Make page writeable*/
