@@ -23,7 +23,8 @@ asmlinkage ssize_t (*original_write)(unsigned int fd, const void *buf, size_t co
 
 /*Hook function - Do desired action here*/
 asmlinkage int new_open(const char *pathname, int flags){
-	if (strstr(pathname,"out.txt")!=NULL) {
+//	if (strstr(pathname, "out.txt")!=NULL) {
+	{
 		printk(KERN_INFO "NEW OPEN SYSCALL");
 		printk(KERN_INFO "CALLING PROCESS: %s\n",current->comm);
 		printk(KERN_INFO "OPENED FILE: %s\n", pathname);
@@ -65,14 +66,11 @@ asmlinkage ssize_t new_write(unsigned int fd, const void *buf, size_t count){
 	ssize_t bytes;
         bytes = (*original_write)(fd, buf, count);
 
-	char *filename;
-	filename=strrchr(pathname,'/');
-	filename+=1;
-
-        if (strstr(pathname,"out.txt")!=NULL) {
+//	if (strstr(pathname,"out.txt")!=NULL) {
+	{
                 printk(KERN_INFO "NEW WRITE SYSCALL");
                 printk(KERN_INFO "CALLING PROCESS: %s\n", current->comm);
-	        printk(KERN_INFO "WRITE TO: %s\n", filename);
+	        printk(KERN_INFO "WRITE TO: %s\n", pathname);
                 printk(KERN_INFO "BYTES WRITTEN: %d\n", bytes);
         }
         free_page((unsigned long)tmp);
