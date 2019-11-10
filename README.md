@@ -26,7 +26,7 @@ Thực hiện bởi:
       ```
       >Lệnh trên đọc 4 byte từ file thiết bị `/dev/randnum` và xuất ra màn hình Terminal dưới dạng kí tự hexa (dùng lệnh `hexdump`). Chạy lệnh này nhiều lần, mỗi lần sẽ cho ra các kết quả ngẫu nhiên khác nhau.
    6. Để gỡ module này, gõ lệnh `sudo rmmod chardevdrv`
-   7. Để dọn sạch các file được tạo ra trong thư mục trong quá trình biên dịch, gõ `make clean`
+   7. Để dọn sạch các file được tạo ra trong thư mục trong quá trình biên dịch, gõ lệnh `make clean`
    
 ## Phần 2 (/Hook) : Chương trình hook vào một system call:
 - syscall `open` => ghi vào `dmesg` tên tiến trình mở file và tên file được mở
